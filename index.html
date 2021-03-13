@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Hub</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside id="user-list"></aside>
+      <main>
+        <section id="instructions" class="active">
+          <h2>Welcome To Our App</h2>
+          <p>On the left you'll see some users.</p>
+          <p>
+            Each has a button which will load posts they've made, and albums
+            they've uploaded.
+          </p>
+          <p><b>Post View</b> posts have a toggle to show/hside comments.</p>
+          <p>
+            <b>Album View</b> images are thumbnails, and when clicked open the
+            full image in a new tab.
+          </p>
+        </section>
+        <section id="post-list"></section>
+        <section id="album-list"></section>
+      </main>
+    </div>
+  </body>
+</html>
