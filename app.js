@@ -1,13 +1,11 @@
 const BASE_URL = "https://jsonplace-univclone.herokuapp.com";
 
-function fetchUsers() {
-  return fetchData(`${BASE_URL}/users`);
-}
-
 function renderUser(user) {
   const userCardEl = $("<div class='user-card'>");
 
-  userCardEl.html(`
+  userCardEl
+    .html(
+      `
   <header><h2>${user.name}</h2></header>
     <section class="company-info">
       <p><b>Contact:</b> ${user.email}</p>
@@ -17,7 +15,10 @@ function renderUser(user) {
   <footer>
     <button class="load-posts">POSTS BY ${user.username}</button>
     <button class="load-albums">ALBUMS BY ${user.username}</button>
-  </footer>`).data("user", user);
+  </footer>
+  `
+    )
+    .data("user", user);
 
   return userCardEl;
 }
@@ -30,32 +31,18 @@ function renderUserList(userList) {
   });
 }
 
-function bootstrap() {
-  fetchUsers().then(renderUserList);
-}
+/* render a single photo */
+function renderPhoto(photo) {
+  const photoEl = $('<div class="photo-card">');
 
-bootstrap();
+  photoEl.html(`
+    <a href="${photo.url}" target="_blank">
+      <img src="${photo.thumbnailUrl}">
+      <figure>${photo.title}</figure>
+    </a>
+  `);
 
-$("#user-list").on("click", ".user-card .load-posts", function () {
-  // load posts for this user
-  const user = $(this).closest(".user-card").data("user");
-  // render posts for this user
-
-  fetchUserPosts(user.id).then(renderPostList);
-});
-
-$("#user-list").on("click", ".user-card .load-albums", function () {
-  // load albums for this user
-  const user = $(this).closest(".user-card").data("user");
-  // render albums for this user
-  fetchUserAlbumList(user.id).then(renderAlbumList);
-});
-
-/* get an album list, or an array of albums */
-function fetchUserAlbumList(userId) {
-  return fetchData(
-    `${BASE_URL}/users/${userId}/albums?_expand=user&_embed=photos`
-  );
+  return photoEl;
 }
 
 /* render a single album */
@@ -77,20 +64,6 @@ function renderAlbum(album) {
   return albumCardEl;
 }
 
-/* render a single photo */
-function renderPhoto(photo) {
-  const photoEl = $('<div class="photo-card">');
-
-  photoEl.html(`
-    <a href="${photo.url}" target="_blank">
-      <img src="${photo.thumbnailUrl}">
-      <figure>${photo.title}</figure>
-    </a>
-  `);
-
-  return photoEl;
-}
-
 /* render an array of albums */
 function renderAlbumList(albumList) {
   $("#app section.active").removeClass("active");
@@ -101,33 +74,7 @@ function renderAlbumList(albumList) {
   });
 }
 
-function fetchData(url) {
-  return fetch(url)
-    .then(function (data) {
-      return data.json();
-    })
-    .catch(function (error) {
-      console.error(error);
-    });
-}
-
-function fetchUserPosts(userId) {
-  return fetchData(`${BASE_URL}/users/${userId}/posts?_expand=user`);
-}
-
-function fetchPostComments(postId) {
-  return fetchData(`${BASE_URL}/posts/${postId}/comments`);
-}
-
-// fetchUserPosts(1).then(console.log);
-// fetchPostComments(1).then(console.log)
-
 function setCommentsOnPost(post) {
-  // post.comments might be undefined, or an []
-  // if undefined, fetch them then set the result
-  // if defined, return a rejected promise
-
-  // if we already have comments, don't fetch them again
   if (post.comments) {
     return Promise.reject(null);
   }
@@ -138,22 +85,6 @@ function setCommentsOnPost(post) {
     return post;
   });
 }
-
-// const successfulPromise = Promise.resolve(3);
-
-// successfulPromise
-//   .then(function (value) {
-//     return 5; // oh no, we lose 3 at this step
-//   })
-//   .then(function (value) {
-//     return value * value;
-//   })
-//   .then(console.log);
-// throwback
-
-// let fakePost = { id: 1 };
-
-// setCommentsOnPost(fakePost).then(console.log).catch(console.error);
 
 function renderPost(post) {
   const postEl = $("<div class='post-card'>");
@@ -197,6 +128,56 @@ function toggleComments(postCardElement) {
     footerElement.find(".verb").text("hide");
   }
 }
+
+function fetchData(url) {
+  return fetch(url)
+    .then(function (data) {
+      return data.json();
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+
+function fetchUsers() {
+  return fetchData(`${BASE_URL}/users`);
+}
+
+function bootstrap() {
+  fetchUsers().then(renderUserList);
+}
+
+bootstrap();
+
+/* get an album list, or an array of albums */
+function fetchUserAlbumList(userId) {
+  return fetchData(
+    `${BASE_URL}/users/${userId}/albums?_expand=user&_embed=photos`
+  );
+}
+
+function fetchUserPosts(userId) {
+  return fetchData(`${BASE_URL}/users/${userId}/posts?_expand=user`);
+}
+
+function fetchPostComments(postId) {
+  return fetchData(`${BASE_URL}/posts/${postId}/comments`);
+}
+
+$("#user-list").on("click", ".user-card .load-posts", function () {
+  // load posts for this user
+  const user = $(this).closest(".user-card").data("user");
+  // render posts for this user
+
+  fetchUserPosts(user.id).then(renderPostList);
+});
+
+$("#user-list").on("click", ".user-card .load-albums", function () {
+  // load albums for this user
+  const user = $(this).closest(".user-card").data("user");
+  // render albums for this user
+  fetchUserAlbumList(user.id).then(renderAlbumList);
+});
 
 $("#post-list").on("click", ".post-card .toggle-comments", function () {
   const postCardElement = $(this).closest(".post-card");
